@@ -27,7 +27,6 @@ export default function Experience() {
   const toast = useWorld((s) => s.toast);
   const { progress, active } = useProgress();
   const [booted, setBooted] = useState(false);
-  const [ready, setReady] = useState(false);
   const [motionOn, setMotionOn] = useState(false);
   const scrollHost = useRef<HTMLDivElement>(null);
 
@@ -116,7 +115,7 @@ export default function Experience() {
           onCreated={({ gl }) => {
             gl.toneMapping = THREE.ACESFilmicToneMapping;
             gl.toneMappingExposure = 1.05;
-            setReady(true);
+
           }}
         >
           <Scene />
