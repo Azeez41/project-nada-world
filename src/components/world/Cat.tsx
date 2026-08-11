@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { useFrame } from "@react-three/fiber";
+import { useFrame, type ThreeEvent } from "@react-three/fiber";
 import * as THREE from "three";
 import { PINK } from "@/lib/world/constants";
 import { sfx } from "@/lib/world/audio";
@@ -65,9 +65,9 @@ export function Cat({
       ref={group}
       position={position}
       scale={scale}
-      onClick={
-        clickable
-          ? (e) => {
+      {...(clickable
+        ? {
+            onClick: (e: ThreeEvent<MouseEvent>) => {
               e.stopPropagation();
               clicks.current += 1;
               sfx("meow");
@@ -75,9 +75,9 @@ export function Cat({
                 angry.current = 1.2;
                 flash("The cat is offended. It has left.");
               }
-            }
-          : undefined
-      }
+            },
+          }
+        : {})}
     >
       {/* body */}
       <mesh castShadow position={[0, 0.28, 0]}>
