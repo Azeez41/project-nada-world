@@ -30,7 +30,6 @@ export default function Experience() {
   const [ready, setReady] = useState(false);
   const [motionOn, setMotionOn] = useState(false);
   const scrollHost = useRef<HTMLDivElement>(null);
-  console.log("EXP_RENDER", { ready, booted, active, progress });
 
   // quality / device profile
   useEffect(() => {
@@ -40,10 +39,9 @@ export default function Experience() {
   }, []);
 
   useEffect(() => {
-    if (!ready) return;
-    const id = setTimeout(() => setBooted(true), active ? 2400 : 900);
+    const id = setTimeout(() => setBooted(true), 2200);
     return () => clearTimeout(id);
-  }, [ready, active]);
+  }, []);
 
   // scroll → normalized world progress
   useEffect(() => {
@@ -119,7 +117,6 @@ export default function Experience() {
             gl.toneMapping = THREE.ACESFilmicToneMapping;
             gl.toneMappingExposure = 1.05;
             setReady(true);
-            console.log("CANVAS_CREATED");
           }}
         >
           <Scene />
