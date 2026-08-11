@@ -1,7 +1,7 @@
 import * as THREE from "three";
 
-export const FONT_DISPLAY = "https://fonts.gstatic.com/s/orbitron/v35/yMJRMIlzdpvBhQQL_Qq7dy0.woff2";
-export const FONT_BODY = "https://fonts.gstatic.com/s/spacegrotesk/v22/V8mDoQDjQSkFtoMM3T6r8E7mPb54C-s0.woff2";
+export const FONT_DISPLAY = "https://fonts.gstatic.com/s/orbitron/v35/yMJMMIlzdpvBhQQL_SC3X9yhF25-T1nymymxpQ.woff";
+export const FONT_BODY = "https://fonts.gstatic.com/s/spacegrotesk/v22/V8mQoQDjQSkFtoMM3T6r8E7mF71Q-gOoraIAEj7oUUsg.woff";
 
 export const PINK = "#ff3d9e";
 export const MAGENTA = "#ff7ac6";
