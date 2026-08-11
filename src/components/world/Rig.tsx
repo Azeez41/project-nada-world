@@ -1,7 +1,7 @@
 import { useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
-import { CAM_CURVE, LOOK_CURVE, GIFT_Z, clamp01 } from "@/lib/world/constants";
+import { AREA_Z, CAM_CURVE, LOOK_CURVE, GIFT_Z, clamp01 } from "@/lib/world/constants";
 import { getWorld, rig, setWorld } from "@/lib/world/store";
 
 const tmp = new THREE.Vector3();
