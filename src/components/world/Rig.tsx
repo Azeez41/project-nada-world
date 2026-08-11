@@ -62,7 +62,15 @@ export function Rig() {
     acc.current += dt;
     if (acc.current > 0.15) {
       acc.current = 0;
-      const area = Math.min(6, Math.max(0, Math.round(t * 6)));
+      let area = 0;
+      let best = Infinity;
+      AREA_Z.forEach((z, i) => {
+        const d = Math.abs(camera.position.z - z);
+        if (d < best) {
+          best = d;
+          area = i;
+        }
+      });
       if (area !== areaRef.current) {
         areaRef.current = area;
         setWorld({ area });
