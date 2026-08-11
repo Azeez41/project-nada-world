@@ -30,6 +30,7 @@ export default function Experience() {
   const [ready, setReady] = useState(false);
   const [motionOn, setMotionOn] = useState(false);
   const scrollHost = useRef<HTMLDivElement>(null);
+  console.log("EXP_RENDER", { ready, booted, active, progress });
 
   // quality / device profile
   useEffect(() => {
