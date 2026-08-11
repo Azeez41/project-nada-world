@@ -3,6 +3,7 @@ import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import {
   AREA_Z,
+  AREA_SPEED,
   CAM_CURVE,
   LOOK_CURVE,
   GIFT_Z,
@@ -37,10 +38,16 @@ export function Rig() {
 
     // scroll velocity + cinematic momentum (lead when scrolling fast, settle when stopped)
     rig.scrollVel = THREE.MathUtils.damp(rig.scrollVel, rig.scrollVelRaw, 7.5, dt);
-    const leadTarget = THREE.MathUtils.clamp(rig.scrollVel * 0.11, -0.045, 0.045);
+    const zoneSpeed = AREA_SPEED[world.area] ?? 1;
+    const leadTarget = THREE.MathUtils.clamp(
+      rig.scrollVel * (0.11 + zoneSpeed * 0.035),
+      -0.055,
+      0.055,
+    );
     rig.momentumLead = THREE.MathUtils.damp(rig.momentumLead, leadTarget, 4.5, dt);
     const scrollGoal = clamp01(rig.scrollTarget + rig.momentumLead);
-    rig.t = THREE.MathUtils.damp(rig.t, scrollGoal, 1.75, dt);
+    const scrollLambda = 1.55 + zoneSpeed * 0.32;
+    rig.t = THREE.MathUtils.damp(rig.t, scrollGoal, scrollLambda, dt);
 
     // pointer / gyro parallax with separate axis smoothing
     rig.px = THREE.MathUtils.damp(rig.px, rig.pxTarget, 3.6, dt);
@@ -81,11 +88,20 @@ export function Rig() {
 
     // breathing drift + parallax offset (stronger in open areas, softer in tunnel)
     const e = state.clock.elapsedTime;
-    const open = THREE.MathUtils.smoothstep(pathT, 0.08, 0.22) * (1 - THREE.MathUtils.smoothstep(pathT, 0.55, 0.72));
+    const open =
+      THREE.MathUtils.smoothstep(pathT, 0.08, 0.22) *
+      (1 - THREE.MathUtils.smoothstep(pathT, 0.55, 0.72));
     const parallax = 1.15 + open * 0.55;
     tmp.x += Math.sin(e * 0.21) * 0.32 + rig.px * 2.0 * parallax;
     tmp.y += Math.cos(e * 0.17) * 0.2 + rig.py * 1.15 * parallax;
     tmp.z += rig.px * 0.35 * parallax;
+
+    // GSAP dialogue beats — subtle dolly / tilt while NADA AI speaks
+    if (rig.dialoguePulse > 0.001) {
+      tmp.z += rig.dialoguePulse * 1.8;
+      tmp.y += rig.dialoguePulse * 0.15;
+      look.z -= rig.dialoguePulse * 0.35;
+    }
 
     // coherent shake — only when kicked (dramatic moments), not random every frame
     if (rig.shake > 0.001) {
@@ -107,11 +123,11 @@ export function Rig() {
 
     camera.position.copy(posSmooth.current);
     camera.lookAt(lookX, lookY, lookZ);
-    camera.rotation.z = rig.roll + Math.sin(e * 0.13) * 0.004;
+    camera.rotation.z = rig.roll + rig.dialogueRoll + Math.sin(e * 0.13) * 0.004;
 
     // publish atmosphere targets for CinematicEffects (smoothed there)
     const atm = sampleAtmosphere(pathT);
-    rig.fov = atm.fov;
+    rig.fov = atm.fov + rig.dialogueFov * 2.5;
     rig.fogDensity = atm.fogDensity;
     rig.fogColor = atm.fogColor;
     rig.focusDistance = atm.focusDistance;

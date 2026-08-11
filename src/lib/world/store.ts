@@ -84,6 +84,10 @@ export const rig = {
   /** planet manual drag */
   spin: 0,
   spinVel: 0,
+  /** GSAP-driven dialogue camera beats (NADA AI) */
+  dialoguePulse: 0,
+  dialogueRoll: 0,
+  dialogueFov: 0,
   /** smoothed atmosphere (written by CinematicEffects) */
   fov: 50,
   fogDensity: 0.012,

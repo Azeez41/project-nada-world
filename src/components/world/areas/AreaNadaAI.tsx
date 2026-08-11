@@ -1,22 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
+import type gsap from "gsap";
 import * as THREE from "three";
 import { Body, Display, HoloButton, Panel } from "../Holo";
 import { Dust } from "../Particles";
 import { AREA_Z, CYAN, PINK, WHITE } from "@/lib/world/constants";
+import { AI_SCRIPT, playAiAnswerBeat, playAiDialogue, stopAiDialogue } from "@/lib/world/aiDialogue";
 import { rig, setWorld, useWorld } from "@/lib/world/store";
 import { sfx } from "@/lib/world/audio";
 
 const Z = AREA_Z[3]!;
-
-const SCRIPT = [
-  "Hello. I have analyzed Abdulaziz.",
-  "...",
-  "I have concerns.",
-  "PROCESSING…",
-  "99.9% CHAOTIC  ·  0.1% NORMAL",
-  "Would you like to continue?",
-];
 
 /** A tiny holographic girl-shaped AI made of glowing geometry. */
 function Hologram({ excited }: { excited: number }) {
@@ -73,21 +66,23 @@ export function AreaNadaAI() {
   const answered = useWorld((s) => s.aiAnswered);
   const [line, setLine] = useState(0);
   const [excited, setExcited] = useState(0);
+  const dialogueRef = useRef<gsap.core.Timeline | null>(null);
 
   useEffect(() => {
-    if (area !== 3) return;
+    if (area !== 3) {
+      stopAiDialogue();
+      return;
+    }
+
     setLine(0);
-    let i = 0;
-    const id = setInterval(() => {
-      i += 1;
-      if (i >= SCRIPT.length) {
-        clearInterval(id);
-        return;
-      }
-      setLine(i);
-      sfx("ai");
-    }, 1900);
-    return () => clearInterval(id);
+    dialogueRef.current?.kill();
+    dialogueRef.current = playAiDialogue(setLine);
+
+    return () => {
+      dialogueRef.current?.kill();
+      dialogueRef.current = null;
+      stopAiDialogue();
+    };
   }, [area]);
 
   useFrame((_, dt) => {
@@ -98,6 +93,7 @@ export function AreaNadaAI() {
     setWorld({ aiAnswered: true });
     setExcited(1);
     sfx("reveal");
+    playAiAnswerBeat();
   };
 
   return (
@@ -112,13 +108,19 @@ export function AreaNadaAI() {
           NADA AI
         </Display>
         <Body position={[0, -0.25, 0.05]} size={0.26} maxWidth={6.4} color={WHITE}>
-          {answered ? "Correct answer." : SCRIPT[line]}
+          {answered ? "Correct answer." : AI_SCRIPT[line]}
         </Body>
       </group>
 
-      {!answered && line >= SCRIPT.length - 1 && (
+      {!answered && line >= AI_SCRIPT.length - 1 && (
         <>
-          <HoloButton label="YES" size={0.24} width={2} position={[-1.5, -2.6, 1]} onClick={answer} />
+          <HoloButton
+            label="YES"
+            size={0.24}
+            width={2}
+            position={[-1.5, -2.6, 1]}
+            onClick={answer}
+          />
           <HoloButton
             label="OBVIOUSLY"
             size={0.24}
