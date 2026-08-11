@@ -1,8 +1,8 @@
 import { useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
-import { Body, Display } from "../Holo";
-import { Cat } from "../Cat";
+import { Body, Display } from "./Holo";
+import { Cat } from "./Cat";
 import { CYAN, GIFT_Z, PINK, WHITE } from "@/lib/world/constants";
 import { rig, useWorld } from "@/lib/world/store";
 
@@ -42,9 +42,9 @@ export function GiftScene() {
       const arr = burst.current.geometry.attributes['position']!.array as Float32Array;
       if (open > 0.05) {
         for (let i = 0; i < arr.length / 3; i++) {
-          arr[i * 3] += vels[i * 3]! * dt * 0.4;
-          arr[i * 3 + 1] += (vels[i * 3 + 1]! - 6) * dt * 0.4;
-          arr[i * 3 + 2] += vels[i * 3 + 2]! * dt * 0.4;
+          arr[i * 3] = arr[i * 3]! + vels[i * 3]! * dt * 0.4;
+          arr[i * 3 + 1] = arr[i * 3 + 1]! + (vels[i * 3 + 1]! - 6) * dt * 0.4;
+          arr[i * 3 + 2] = arr[i * 3 + 2]! + vels[i * 3 + 2]! * dt * 0.4;
           if (arr[i * 3 + 1]! > 40) arr[i * 3 + 1] = 0;
         }
         burst.current.geometry.attributes['position']!.needsUpdate = true;
