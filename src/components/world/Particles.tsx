@@ -39,14 +39,14 @@ export function Dust({
   useFrame((state) => {
     const p = points.current;
     if (!p) return;
-    const arr = p.geometry.attributes.position!.array as Float32Array;
+    const arr = p.geometry.attributes['position']!.array as Float32Array;
     const t = state.clock.elapsedTime * speed;
     for (let i = 0; i < count; i++) {
       const ph = phases[i]!;
       arr[i * 3 + 1] = base[i * 3 + 1]! + Math.sin(t * 0.35 + ph) * 1.6;
       arr[i * 3] = base[i * 3]! + Math.cos(t * 0.22 + ph) * 1.1;
     }
-    p.geometry.attributes.position!.needsUpdate = true;
+    p.geometry.attributes['position']!.needsUpdate = true;
     p.rotation.y = t * 0.01;
   });
 
