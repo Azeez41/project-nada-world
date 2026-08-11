@@ -27,6 +27,7 @@ export default function Experience() {
   const toast = useWorld((s) => s.toast);
   const { progress, active } = useProgress();
   const [booted, setBooted] = useState(false);
+  const [ready, setReady] = useState(false);
   const [motionOn, setMotionOn] = useState(false);
   const scrollHost = useRef<HTMLDivElement>(null);
 
@@ -38,10 +39,10 @@ export default function Experience() {
   }, []);
 
   useEffect(() => {
-    if (active) return;
-    const id = setTimeout(() => setBooted(true), 900);
+    if (!ready) return;
+    const id = setTimeout(() => setBooted(true), active ? 2400 : 900);
     return () => clearTimeout(id);
-  }, [active, progress]);
+  }, [ready, active]);
 
   // scroll → normalized world progress
   useEffect(() => {
@@ -116,6 +117,7 @@ export default function Experience() {
           onCreated={({ gl }) => {
             gl.toneMapping = THREE.ACESFilmicToneMapping;
             gl.toneMappingExposure = 1.05;
+            setReady(true);
           }}
         >
           <Scene />
