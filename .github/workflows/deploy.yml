@@ -3,7 +3,7 @@ name: Deploy Nada World
 on:
   push:
     branches:
-      - cursor/cinematic-camera-improvements
+      -cursor/cinematic-camera-improvements
   workflow_dispatch:
 
 permissions:
