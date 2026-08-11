@@ -118,6 +118,7 @@ export default function Experience() {
             gl.toneMapping = THREE.ACESFilmicToneMapping;
             gl.toneMappingExposure = 1.05;
             setReady(true);
+            console.log("CANVAS_CREATED");
           }}
         >
           <Scene />
