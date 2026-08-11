@@ -58,22 +58,43 @@ export function flash(message: string, ms = 2600) {
 export const rig = {
   /** eased global scroll progress 0..1 */
   t: 0,
-  /** raw scroll target 0..1 */
-  target: 0,
+  /** scroll position target 0..1 (from DOM scroll) */
+  scrollTarget: 0,
+  /** normalized scroll velocity (updated from DOM, smoothed in Rig) */
+  scrollVel: 0,
+  scrollVelRaw: 0,
+  /** short-lived lead/lag for scroll momentum */
+  momentumLead: 0,
+  /** arc-length corrected curve parameter (for atmosphere + sampling) */
+  pathT: 0,
   /** pointer in NDC-ish space, eased */
   px: 0,
   py: 0,
   pxTarget: 0,
   pyTarget: 0,
+  /** optional gyro blend (0 = pointer only, 1 = gyro only) */
+  gyroBlend: 0,
+  /** path banking + pointer roll, radians */
+  roll: 0,
   /** camera shake impulse */
   shake: 0,
+  shakePhase: Math.random() * Math.PI * 2,
   /** gift box reveal progress 0..1 */
   gift: 0,
   /** planet manual drag */
   spin: 0,
   spinVel: 0,
+  /** smoothed atmosphere (written by CinematicEffects) */
+  fov: 50,
+  fogDensity: 0.012,
+  fogColor: "#07030d",
+  focusDistance: 0.012,
+  bokehScale: 3.2,
+  ambientIntensity: 0.35,
+  dirLightIntensity: 1.6,
 };
 
 export function kick(amount = 1) {
   rig.shake = Math.min(2, rig.shake + amount);
+  rig.shakePhase = Math.random() * Math.PI * 2;
 }
