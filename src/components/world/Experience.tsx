@@ -38,11 +38,9 @@ export default function Experience() {
   }, []);
 
   useEffect(() => {
-    if (!active && progress >= 100) {
-      const id = setTimeout(() => setBooted(true), 600);
-      return () => clearTimeout(id);
-    }
-    return;
+    if (active) return;
+    const id = setTimeout(() => setBooted(true), 900);
+    return () => clearTimeout(id);
   }, [active, progress]);
 
   // scroll → normalized world progress
@@ -191,7 +189,7 @@ export default function Experience() {
           INITIALIZING NADA
         </div>
         <div className="mt-3 h-px w-40 overflow-hidden bg-foreground/15">
-          <div className="h-full bg-primary transition-all duration-300" style={{ width: `${progress}%` }} />
+          <div className="h-full bg-primary transition-all duration-300" style={{ width: `${active ? Math.max(8, progress) : 100}%` }} />
         </div>
       </div>
     </div>
