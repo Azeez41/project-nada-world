@@ -42,29 +42,60 @@ export default function Experience() {
     return () => clearTimeout(id);
   }, []);
 
-  // scroll → normalized world progress
+  // scroll → normalized world progress + velocity for camera momentum
   useEffect(() => {
-    const onScroll = () => {
+    const scrollState = { y: window.scrollY, t: performance.now() };
+
+    const applyScroll = () => {
       const max = document.body.scrollHeight - window.innerHeight;
-      rig.target = max > 0 ? THREE.MathUtils.clamp(window.scrollY / max, 0, 1) : 0;
+      rig.scrollTarget = max > 0 ? THREE.MathUtils.clamp(window.scrollY / max, 0, 1) : 0;
     };
-    onScroll();
+
+    const onScroll = () => {
+      const now = performance.now();
+      const max = document.body.scrollHeight - window.innerHeight;
+      const dt = Math.max(0.001, (now - scrollState.t) / 1000);
+      const dy = window.scrollY - scrollState.y;
+      const normVel = max > 0 ? dy / dt / max : 0;
+      rig.scrollVelRaw = THREE.MathUtils.clamp(normVel, -2.5, 2.5);
+      scrollState.y = window.scrollY;
+      scrollState.t = now;
+      applyScroll();
+    };
+
+    applyScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
+    window.addEventListener("resize", applyScroll);
     return () => {
       window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
+      window.removeEventListener("resize", applyScroll);
     };
   }, []);
 
-  // pointer / touch parallax
+  // pointer / touch parallax — damped in Rig; reduced sensitivity on small screens
   useEffect(() => {
+    const mobile = window.matchMedia("(max-width: 900px)").matches;
+    const gain = mobile ? 0.72 : 1;
+
     const onMove = (e: PointerEvent) => {
-      rig.pxTarget = (e.clientX / window.innerWidth - 0.5) * 2;
-      rig.pyTarget = (e.clientY / window.innerHeight - 0.5) * 2;
+      if (rig.gyroBlend > 0.85) return;
+      const blend = 1 - rig.gyroBlend;
+      rig.pxTarget = (e.clientX / window.innerWidth - 0.5) * 2 * gain * blend;
+      rig.pyTarget = (e.clientY / window.innerHeight - 0.5) * 2 * gain * blend;
     };
+
+    const onLeave = () => {
+      if (rig.gyroBlend > 0.85) return;
+      rig.pxTarget = 0;
+      rig.pyTarget = 0;
+    };
+
     window.addEventListener("pointermove", onMove, { passive: true });
-    return () => window.removeEventListener("pointermove", onMove);
+    window.addEventListener("pointerleave", onLeave);
+    return () => {
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerleave", onLeave);
+    };
   }, []);
 
   // lock scrolling until the simulation is entered
@@ -92,6 +123,7 @@ export default function Experience() {
         const res = await D.requestPermission();
         if (res !== "granted") return;
       }
+      rig.gyroBlend = 1;
       window.addEventListener("deviceorientation", (e) => {
         if (e.gamma == null || e.beta == null) return;
         rig.pxTarget = THREE.MathUtils.clamp(e.gamma / 35, -1, 1);
